@@ -13,8 +13,10 @@ jobs:
     environment: testing
     runs-on: ubuntu-latest    # The below steps are running on the ubuntu-latest image and the tools available on ubuntu-latest are not available on the node:16 image.
     # Just the ubuntu-latest is hosted on a container based on the node:16 image.
-    container:
-      image: node:16
+
+    # container:
+    #   image: node:16
+
     # All the below cmd is running on the container based on node:16 image
     env:
       # MONGODB_CONNECTION_PROTOCOL: mongodb+srv
@@ -23,8 +25,10 @@ jobs:
       # MONGODB_PASSWORD: ${{ secrets.MONGODB_PASSWORD }}
 
       # because of the github actions creates a network between the container and the mongodb service, we can use the below env variables to connect to the MongoDB service.
+      # MONGODB_CONNECTION_PROTOCOL: mongodb
+      # MONGODB_CLUSTER_ADDRESS: mongodb
       MONGODB_CONNECTION_PROTOCOL: mongodb
-      MONGODB_CLUSTER_ADDRESS: mongodb
+      MONGODB_CLUSTER_ADDRESS: 127.0.0.1:27017    # the port is the host port because the container is commented out, so the mongodb service is running on the host port 27017
       # This are the credentails that are used to connecting the MongoDB Atlas database and use the same credentials for the environment variables that are used by the steps.
       MONGODB_USERNAME: root
       MONGODB_PASSWORD: example
@@ -32,6 +36,8 @@ jobs:
     services:
       mongodb:
         image: mongo    # because it isn't running on "runner like ubuntu-latest", we need to specify the image
+        ports:
+          - 27017:27017    # the first port is the host port and the second port is the container port the runner port is the same as the container port
         env:
           # The below env variables are used to "initialize" the MongoDB container
           MONGO_INITDB_ROOT_USERNAME: root
